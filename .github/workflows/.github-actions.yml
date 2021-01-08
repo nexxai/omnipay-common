@@ -39,15 +39,15 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install dependencies (Symfony != '*')
-      if: ${{symfony}} != '*'
-      run: composer require symfony/http-foundation:${{symfony}} --no-update --no-interaction
+      if: ${{env.symfony}} != '*'
+      run: composer require symfony/http-foundation:${{env.symfony}} --no-update --no-interaction
       
     - name: Install dependencies (Setup = basic)
-      if: ${{setup}} = 'basic'
+      if: ${{env.setup}} = 'basic'
       run: composer install --prefer-dist --no-interaction
       
     - name: Install dependencies (Setup = lowest)
-      if: ${{setup}} = 'lowest'
+      if: ${{env.setup}} = 'lowest'
       run: composer update --prefer-dist --no-interaction --prefer-lowest --prefer-stable
       
     - name: Run PHPCS
