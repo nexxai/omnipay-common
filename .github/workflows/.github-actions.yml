@@ -1,0 +1,63 @@
+name: php
+
+on: [push, pull_request]
+
+jobs:  
+  build:
+    env:
+      setup: 'basic'
+      symfony: "*"  
+    strategy:
+      matrix:
+        php: [5.6, 7.1, 7.2, 7.3, 7.4, 8.0]
+        include:
+          - php-version: 5.6
+            setup: 'lowest'
+            symfony: "^2.1"
+          - php-version: 5.6
+            setup: 'lowest' 
+            symfony: "^3"
+          - php-version: 7.1
+            setup: 'lowest' 
+            symfony: "^4"
+          - php-version: 7.2
+            setup: 'lowest' 
+            symfony: "^5"
+          - php-version: 7.3
+            setup: 'lowest' 
+            symfony: "^5"
+          - php-version: 7.4
+            setup: 'lowest' 
+            symfony: "^5"
+          - php-version: 8.0
+            setup: 'lowest' 
+            symfony: "^5"
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies (Symfony != '*')
+      if: ${{symfony}} != '*'
+      run: composer require symfony/http-foundation:${{symfony}} --no-update --no-interaction
+      
+    - name: Install dependencies (Setup = basic)
+      if: ${{setup}} = 'basic'
+      run: composer install --prefer-dist --no-interaction
+      
+    - name: Install dependencies (Setup = lowest)
+      if: ${{setup}} = 'lowest'
+      run: composer update --prefer-dist --no-interaction --prefer-lowest --prefer-stable
+      
+    - name: Run PHPCS
+      run: vendor/bin/phpcs --standard=PSR2 src/
+      
+    - name: Run PHPUnit
+      run: vendor/bin/phpunit --coverage-text  --coverage-clover=coverage.clover
+    
+    - name: Get Scrutinizer
+      run: wget https://scrutinizer-ci.com/ocular.phar
+    
+    - name: Upload results to Scrutinizer
+      run: php ocular.phar code-coverage:upload --format=php-clover coverage.clover
