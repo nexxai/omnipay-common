@@ -37,6 +37,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      
+    - name: Downgrade composer to v1 for now
+      run: composer --1 self-update
 
     - name: Install dependencies (Symfony != '*')
       if: ${{env.symfony}} != '*'
