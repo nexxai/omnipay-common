@@ -9,34 +9,43 @@ jobs:
       symfony: "*"  
     strategy:
       matrix:
-        php: [5.6, 7.1, 7.2, 7.3, 7.4, 8.0]
         include:
-          - php-version: 5.6
+          - php: 5.6
             setup: 'lowest'
             symfony: "^2.1"
-          - php-version: 5.6
+          - php: 5.6
             setup: 'lowest' 
             symfony: "^3"
-          - php-version: 7.1
+          - php: 7.1
             setup: 'lowest' 
             symfony: "^4"
-          - php-version: 7.2
+          - php: 7.2
             setup: 'lowest' 
             symfony: "^5"
-          - php-version: 7.3
+          - php: 7.3
             setup: 'lowest' 
             symfony: "^5"
-          - php-version: 7.4
+          - php: 7.4
             setup: 'lowest' 
             symfony: "^5"
-          - php-version: 8.0
+          - php: 8.0
             setup: 'lowest' 
             symfony: "^5"
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2   
+      with:
+        php-version: ${{ matrix.php }}
+        extensions: mbstring, intl
+        ini-values: post_max_size=256M, max_execution_time=180
+        coverage: xdebug        
+        tools: php-cs-fixer, phpunit:latest
 
     - name: Install dependencies (Symfony != '*')
       if: ${{ env.symfony != '*' }}
